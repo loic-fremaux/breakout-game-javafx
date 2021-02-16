@@ -15,16 +15,16 @@ import java.util.concurrent.TimeUnit;
 
 public class Breakout {
 
-    private Circle ball;
+    private Ball ball;
     private Rectangle pane;
     private List<Brick> bricks = new LinkedList<>();
 
     private final Stage stage;
 
-    private static final int TICK_RATE = 120;
+    private static final int TICK_RATE = 60;
 
-    private static final int BALL_SPEED = 2;
-    private static final int BALL_RADIUS = 25;
+    protected static final int BALL_SPEED = 5;
+    protected static final int BALL_RADIUS = 25;
 
     private static final int BRICK_WIDTH = 100;
     private static final int BRICK_HEIGHT = 25;
@@ -32,8 +32,8 @@ public class Breakout {
     private static final int PANE_WIDTH = 125;
     private static final int PANE_HEIGHT = 20;
 
-    private static final int WINDOW_WIDTH = 720;
-    private static final int WINDOW_HEIGHT = 1280;
+    protected static final int WINDOW_WIDTH = 1280;
+    protected static final int WINDOW_HEIGHT = 720;
 
     private static final int BOTTOM_MARGIN = 50;
 
@@ -43,14 +43,13 @@ public class Breakout {
 
     public void gameLoop() {
         ThreadPool.executeTimer(UUID.randomUUID(), () -> {
-            this.ball.setTranslateX(this.ball.getTranslateX() - BALL_SPEED);
-            this.ball.setTranslateY(this.ball.getTranslateY() - BALL_SPEED);
+            this.ball.tick();
         }, 0, 1000 / TICK_RATE, TimeUnit.MILLISECONDS);
     }
 
     public void buildPanel() {
         final StackPane panel = new StackPane();
-        final Scene scene = new Scene(panel, WINDOW_HEIGHT, WINDOW_WIDTH);
+        final Scene scene = new Scene(panel, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         stage.setScene(scene);
         stage.show();
@@ -58,13 +57,12 @@ public class Breakout {
         final Rectangle pane = createPane(panel);
         this.pane = pane;
 
-        final Circle ball = createBall(panel);
-        this.ball = ball;
+        final Circle circle = createBall(panel);
+        this.ball = new Ball(circle);
 
         scene.setOnMouseMoved(e -> {
             Platform.runLater(() -> {
-                pane.setTranslateX(e.getX()-(WINDOW_HEIGHT >> 1));
-                System.out.println("X: " + e.getX() + " Y: " + e.getY());
+                pane.setTranslateX(e.getX()-(WINDOW_WIDTH >> 1));
             });
         });
 
@@ -83,7 +81,7 @@ public class Breakout {
 
     private Rectangle createPane(StackPane pane) {
         final Rectangle box = new Rectangle();
-        box.setTranslateY((WINDOW_WIDTH >> 1) - BOTTOM_MARGIN);
+        box.setTranslateY((WINDOW_HEIGHT >> 1) - BOTTOM_MARGIN);
         box.setWidth(PANE_WIDTH);
         box.setHeight(PANE_HEIGHT);
         box.setStyle("-fx-background-color: #33ff8c");
@@ -94,7 +92,7 @@ public class Breakout {
 
     private Circle createBall(StackPane pane) {
         final Circle circle = new Circle();
-        circle.setTranslateY((WINDOW_WIDTH >> 1) - BOTTOM_MARGIN - (PANE_HEIGHT >> 1) - BALL_RADIUS);
+        circle.setTranslateY((WINDOW_HEIGHT >> 1) - BOTTOM_MARGIN - (PANE_HEIGHT >> 1) - BALL_RADIUS);
         circle.setRadius(BALL_RADIUS);
         circle.setStyle("-fx-background-color: #33daff");
 
